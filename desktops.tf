@@ -38,14 +38,13 @@ resource "azurerm_network_interface" "avd_vm_nic" {
   }
 
 }
-/*
-If you have a custom image from a gallery, you can use the following code to get the image id:
+
 ##############################################
 # IMAGE REFERENCE
 ##############################################
 data "azurerm_image" "main" {
-  name                = "WindowsSupportImage_wvd-1.0.0"
-  resource_group_name = azurerm_resource_group.rg.name
+  name                = var.image_name
+  resource_group_name = var.img_rg_name
   #resource_group_name      = var.rg_name
 }
 
@@ -139,7 +138,8 @@ resource "azurerm_virtual_machine_extension" "avd_sh" {
 ##############################################
 resource "azurerm_virtual_machine_extension" "avd_aad" {
   depends_on = [
-    azurerm_virtual_machine.avd_ivm
+    azurerm_virtual_machine_extension.avd_sh,
+    null_resource.assignable
   ]
   count                = var.vm_count
   name                 = "${var.prefix}${count.index + 1}-avd_domain"
@@ -147,28 +147,40 @@ resource "azurerm_virtual_machine_extension" "avd_aad" {
   publisher            = "Microsoft.Compute"
   type                 = "JsonADDomainExtension"
   type_handler_version = "1.0"
+  auto_upgrade_minor_version = true
 
-  settings = <<SETTINGS
-    {
-        "Name": "silicio14co.onmicrosoft.com",
-        "User": "silicio14co.onmicrosoft.com\\addadmin",
-        "Restart": "true",
-        "Options": "3"
-    }
-SETTINGS
-
-  protected_settings = <<PROTECTED_SETTINGS
-    {
-        "Password": "${var.admin_password}"
-    }
-PROTECTED_SETTINGS
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
-*/
+resource "azurerm_virtual_machine_extension" "addaadjprivate" {
+  depends_on = [
+    azurerm_virtual_machine_extension.avd_aad
+  ]
+  for_each             = toset(var.avd_desktop_user_list)
+  name                 = "AADJPRIVATE"
+  virtual_machine_id   = azurerm_windows_virtual_machine.avd_sessionhost[each.key].id
+  publisher            = "Microsoft.Compute"
+  type                 = "CustomScriptExtension"
+  type_handler_version = "1.9"
 
+  settings = <<SETTINGS
+        {
+            "commandToExecute": "powershell.exe -Command \"${local.powershell_command}\""
+        }
+    SETTINGS
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
+}
+
+/*
 ##############################################
 # VIRTUAL MACHINES
 ##############################################
+If you have not a custom image from a gallery, you can use the following code to get the image id:
 resource "azurerm_windows_virtual_machine" "avd_vm" {
   depends_on = [
     azurerm_network_interface.avd_vm_nic,
@@ -280,6 +292,7 @@ resource "azurerm_virtual_machine_extension" "addaadjprivate" {
     }
 SETTINGS
 }
+*/
 
 ##############################################
 # VM SHUTDOWN SCHEDULE
@@ -299,5 +312,31 @@ resource "azurerm_dev_test_global_vm_shutdown_schedule" "avd_sessionhost" {
 
   lifecycle {
     ignore_changes = [tags]
+  }
+}
+
+# Assignment Using PowerShell command at terraform agent and deleting session host when deleted
+# Will Work if terraforms agent has powershell
+resource "null_resource" "assignment" {
+  depends_on = [azurerm_virtual_machine_extension.AVDModule]
+  for_each   = toset(var.avd_desktop_user_list)
+
+  triggers = {
+    HostPoolName      = azurerm_virtual_desktop_host_pool.hostpool.name
+    Name              = "${azurerm_windows_virtual_machine.avd_sessionhost[each.key].name}"
+    ResourceGroupName = azurerm_resource_group.avd.name
+  }
+
+  provisioner "local-exec" {
+    command = <<EOT
+      pwsh -File ./scripts/avd-host-assignment.ps1 -HostPoolName ${azurerm_virtual_desktop_host_pool.hostpool.name} -Name ${azurerm_windows_virtual_machine.avd_sessionhost[each.key].name} -ResourceGroupName ${azurerm_resource_group.avd.name} -AssignedUser ${each.key}
+    EOT
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<EOT
+      pwsh -File ./scripts/avd-host-remove.ps1 -HostPoolName ${self.triggers.HostPoolName} -Name ${self.triggers.Name} -ResourceGroupName ${self.triggers.ResourceGroupName}
+    EOT
   }
 }

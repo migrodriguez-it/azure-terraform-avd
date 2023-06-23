@@ -56,3 +56,20 @@ resource "azurerm_role_assignment" "az_role" {
   role_definition_id = data.azurerm_role_definition.az_role.id
   principal_id       = azuread_group.aad_group.id
 }
+
+# PowerOn on session start
+##############################################
+# POWERON ROLE DEFINITION
+##############################################
+data "azurerm_role_definition" "poweron" {
+  name  = "Desktop Virtualization Power On Contributor"
+  scope = data.azurerm_subscription.subs.id
+}
+data "azuread_service_principal" "poweron" {
+  display_name = "Terraform"
+}
+resource "azurerm_role_assignment" "poweron" {
+  scope              = azurerm_resource_group.avd.id
+  role_definition_id = data.azurerm_role_definition.poweron.id
+  principal_id       = data.azuread_service_principal.poweron.id
+}
