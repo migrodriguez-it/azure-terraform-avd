@@ -47,8 +47,8 @@ resource "azurerm_network_security_group" "nsg" {
 ##############################################
 resource "azurerm_route_table" "avdroute" {
   name                          = "rt-avd"
-  location                      = azurerm_resource_group.avd.location
-  resource_group_name           = azurerm_resource_group.avd.name
+  location                      = var.location
+  resource_group_name           = azurerm_resource_group.rg.name
   disable_bgp_route_propagation = false
 
   route {

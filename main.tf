@@ -10,7 +10,7 @@ resource "azurerm_resource_group" "rg" {
 # STORAGE ACCOUNT
 ##############################################
 resource "azurerm_storage_account" "sa" {
-  name = "${var.prefix}avdsa"
+  name                     = "${var.prefix}avdsa"
   resource_group_name      = var.rg_name
   location                 = var.location
   account_tier             = "Premium"
@@ -31,7 +31,7 @@ resource "azurerm_storage_container" "sa_con" {
 # STORAGE ACCOUNT FILESTORAGE
 ##############################################
 resource "azurerm_storage_account" "sa-fs" {
-  name = "${var.prefix}avdfs"
+  name                     = "${var.prefix}avdfs"
   resource_group_name      = var.rg_name
   location                 = var.location
   account_tier             = "Premium"

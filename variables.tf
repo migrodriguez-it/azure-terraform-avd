@@ -2,32 +2,28 @@
 # TENANT ID
 ##############################################
 variable "tenant_id" {
-  default = "44c66bc4-db09-4b73-a231-825dedcda881"
-  #default = "6a8e6d20-fdb6-4869-82b2-98890a7e60a2" # Tenant Test
+  default = "6a8e6d20-fdb6-4869-82b2-98890a7e60a2" # Tenant Test
 }
 
 ##############################################
 # SUBSCIPTION ID
 ##############################################
 variable "subs_id" {
-  default = "1b023971-4d9e-4b17-b351-b46e3058bac2"
-  #default = "68230767-492f-4f64-934b-5a72cf53c0b8" # Tenant Test
+  default = "68230767-492f-4f64-934b-5a72cf53c0b8" # Tenant Test
 }
 
 ##############################################
 # CLIENT ID
 ##############################################
 variable "client_id" {
-  default = "9e458975-f03a-4522-b7e2-19653c89e1a4"
-  #default = "18339f49-35c0-499b-9e18-ab52c32276b8" # Tennnt Test
+  default = "18339f49-35c0-499b-9e18-ab52c32276b8" # Tennnt Test
 }
 
 ##############################################
 # SECRET ID
 ##############################################
 variable "secret_id" {
-  default = "bt28Q~6rBN1vTGaCwDwJ46QR1TooUnwFX3Vqnbik"
-  #default = "BEv8Q~UGEKciY0oQR2BQhXn2JWS6aCGEOKllfc_q" # Tenant Test
+  default = "BEv8Q~UGEKciY0oQR2BQhXn2JWS6aCGEOKllfc_q" # Tenant Test
 }
 
 ##############################################
@@ -106,9 +102,9 @@ variable "vm_count" {
 # DOMAIN NAME
 ##############################################
 variable "domain_name" {
-  type    = string
-  default = "ausum.cloud"
-  #default = "silicio14.co"
+  type = string
+  #default = "ausum.cloud"
+  default = "silicio14.co"
 }
 
 /*
@@ -195,7 +191,7 @@ variable "admin_password" {
 ##############################################
 variable "avd_users" {
   default = [
-    "miguel.rodriguez@ausum.cloud"
+    "miguel@silicio14.co"
   ]
 }
 
