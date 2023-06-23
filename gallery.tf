@@ -1,3 +1,5 @@
+/*
+If you have your images in a Shared Image Gallery, you can use the following code:
 ##############################################
 # SHARED IMAGES GALLERY
 ##############################################
@@ -26,3 +28,4 @@ resource "azurerm_shared_image" "imgdef" {
     sku       = var.vm_sku
   }
 }
+*/
