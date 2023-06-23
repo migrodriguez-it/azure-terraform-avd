@@ -1,4 +1,5 @@
 /*
+If you want configure a scaling plan, you can use the following code:
 resource "random_uuid" "avd_uuid" {
 }
 
