@@ -33,7 +33,7 @@ If the resource group already exists, you can use the following code:
 ##############################################
 variable "rg_name" {
   type    = string
-  default = "miguel_rodriguez"
+  default = ""
 }
 */
 
@@ -76,7 +76,7 @@ variable "tmz" {
 ##############################################
 variable "lb_type" {
   type    = string
-  default = "BreadthFirst" #[BreadthFirst DepthFirst]
+  default = "Persistent" #[Persistent BreadthFirst DepthFirst]
 }
 
 ##############################################
@@ -85,6 +85,14 @@ variable "lb_type" {
 variable "hp_type" {
   type    = string
   default = "Personal" #[Pooled Personal]
+}
+
+##############################################
+# HOSTPOOL TYPE
+##############################################
+variable "personal_assignment" {
+  type    = string
+  default = "Direct" #[Direct Automatic]
 }
 
 ##############################################
@@ -105,7 +113,7 @@ variable "vm_count" {
 # DOMAIN NAME
 ##############################################
 variable "domain_name" {
-  type = string
+  type    = string
   default = "silicio14.co"
 }
 

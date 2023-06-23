@@ -3,7 +3,7 @@
 # LOCALS INFO
 ##############################################
 locals {
-  registration_token = azurerm_virtual_desktop_host_pool_registration_info.reginfo.token # REGSITRATION TOKEN INFO
+  registration_token = azurerm_virtual_desktop_host_pool_registration_info.reginfo.token # REGISTRATION TOKEN INFO
   shutdown_command   = "shutdown -r -t 10"
   exit_code_hack     = "exit 0"
   commandtorun       = "New-Item -Path HKLM:/SOFTWARE/Microsoft/RDInfraAgent/AADJPrivate"
@@ -25,11 +25,11 @@ resource "random_string" "AVD_local_password" {
 # NETWORK INTERFACES
 ##############################################
 resource "azurerm_network_interface" "avd_vm_nic" {
-  count               = var.vm_count
-  name                = "${var.prefix}-${count.index + 1}-nic"
-  resource_group_name = var.rg_name
-  #resource_group_name = azurerm_resource_group.rg.name
-  location = var.location
+  count = var.vm_count
+  name  = "${var.prefix}-${count.index + 1}-nic"
+  #resource_group_name = var.rg_name
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = var.location
 
   ip_configuration {
     name                          = "nic${count.index + 1}_config"
@@ -39,6 +39,7 @@ resource "azurerm_network_interface" "avd_vm_nic" {
 
 }
 /*
+If you have a custom image from a gallery, you can use the following code to get the image id:
 ##############################################
 # IMAGE REFERENCE
 ##############################################
@@ -169,10 +170,14 @@ PROTECTED_SETTINGS
 # VIRTUAL MACHINES
 ##############################################
 resource "azurerm_windows_virtual_machine" "avd_vm" {
-  count               = var.vm_count
-  name                = "${var.prefix}-${count.index + 1}"
-  resource_group_name = var.rg_name
-  #resource_group_name   = azurerm_resource_group.rg.name
+  depends_on = [
+    azurerm_network_interface.avd_vm_nic,
+    azurerm_route_table.avdroute
+  ]
+  count = var.vm_count
+  name  = "${var.prefix}-${count.index + 1}"
+  #resource_group_name = var.rg_name
+  resource_group_name   = azurerm_resource_group.rg.name
   location              = var.location
   size                  = var.vm_size
   network_interface_ids = ["${azurerm_network_interface.avd_vm_nic.*.id[count.index]}"]
@@ -199,10 +204,6 @@ resource "azurerm_windows_virtual_machine" "avd_vm" {
   identity {
     type = "SystemAssigned"
   }
-
-  depends_on = [
-    azurerm_network_interface.avd_vm_nic
-  ]
 }
 
 ##############################################
@@ -278,4 +279,25 @@ resource "azurerm_virtual_machine_extension" "addaadjprivate" {
         "commandToExecute": "powershell.exe -Command \"${local.powershell_command}\""
     }
 SETTINGS
+}
+
+##############################################
+# VM SHUTDOWN SCHEDULE
+##############################################
+resource "azurerm_dev_test_global_vm_shutdown_schedule" "avd_sessionhost" {
+  for_each           = toset(var.avd_desktop_user_list)
+  virtual_machine_id = azurerm_windows_virtual_machine.avd_sessionhost[each.key].id
+  location           = azurerm_resource_group.avd.location
+  enabled            = true
+
+  daily_recurrence_time = "2300"
+  timezone              = var.tmz
+
+  notification_settings {
+    enabled = false
+  }
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
