@@ -141,12 +141,12 @@ resource "azurerm_virtual_machine_extension" "avd_aad" {
     azurerm_virtual_machine_extension.avd_sh,
     null_resource.assignable
   ]
-  count                = var.vm_count
-  name                 = "${var.prefix}${count.index + 1}-avd_domain"
-  virtual_machine_id   = azurerm_virtual_machine.avd_ivm.*.id[count.index]
-  publisher            = "Microsoft.Compute"
-  type                 = "JsonADDomainExtension"
-  type_handler_version = "1.0"
+  count                      = var.vm_count
+  name                       = "${var.prefix}${count.index + 1}-avd_domain"
+  virtual_machine_id         = azurerm_virtual_machine.avd_ivm.*.id[count.index]
+  publisher                  = "Microsoft.Compute"
+  type                       = "JsonADDomainExtension"
+  type_handler_version       = "1.0"
   auto_upgrade_minor_version = true
 
   lifecycle {
