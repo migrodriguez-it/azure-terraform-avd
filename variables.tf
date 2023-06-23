@@ -2,30 +2,32 @@
 # TENANT ID
 ##############################################
 variable "tenant_id" {
-  default = "6a8e6d20-fdb6-4869-82b2-98890a7e60a2" # Tenant Test
+  default = ""
 }
 
 ##############################################
 # SUBSCIPTION ID
 ##############################################
 variable "subs_id" {
-  default = "68230767-492f-4f64-934b-5a72cf53c0b8" # Tenant Test
+  default = ""
 }
 
 ##############################################
 # CLIENT ID
 ##############################################
 variable "client_id" {
-  default = "18339f49-35c0-499b-9e18-ab52c32276b8" # Tennnt Test
+  default = ""
 }
 
 ##############################################
 # SECRET ID
 ##############################################
 variable "secret_id" {
-  default = "BEv8Q~UGEKciY0oQR2BQhXn2JWS6aCGEOKllfc_q" # Tenant Test
+  default = ""
 }
 
+/*
+If the resource group already exists, you can use the following code:
 ##############################################
 # RESOURCE GROUP NAME
 ##############################################
@@ -33,6 +35,7 @@ variable "rg_name" {
   type    = string
   default = "miguel_rodriguez"
 }
+*/
 
 ##############################################
 # HOST POOL
@@ -47,7 +50,7 @@ variable "hostpool" {
 ##############################################
 variable "prefix" {
   type    = string
-  default = "ausumcloud"
+  default = "silicio14"
 }
 
 ##############################################
@@ -81,7 +84,7 @@ variable "lb_type" {
 ##############################################
 variable "hp_type" {
   type    = string
-  default = "Pooled" #[Pooled Personal]
+  default = "Personal" #[Pooled Personal]
 }
 
 ##############################################
@@ -103,11 +106,11 @@ variable "vm_count" {
 ##############################################
 variable "domain_name" {
   type = string
-  #default = "ausum.cloud"
   default = "silicio14.co"
 }
 
 /*
+Use this code if you have a own domain controller 
 ##############################################
 # DOMAIN NAME USER
 ##############################################
@@ -121,7 +124,7 @@ variable "domain_user" {
 ##############################################
 variable "domain_password" {
   type      = string
-  default   = "Mr19780206&$"
+  default   = ""
   sensitive = true
 }
 */
@@ -140,7 +143,7 @@ variable "vm_size" {
 ##############################################
 variable "vm_sku" {
   type    = string
-  default = "win10-21h2-avd-g2"
+  default = "win10-22h2-avd-g2"
 }
 
 ##############################################
@@ -181,7 +184,7 @@ variable "local_admin_username" {
 ##############################################
 variable "admin_password" {
   type      = string
-  default   = "Mr19780206&$"
+  default   = ""
   sensitive = true
 }
 */
@@ -189,6 +192,7 @@ variable "admin_password" {
 ##############################################
 # VIRTUAL DESKTOP DOMAIN USERS
 ##############################################
+#Add the users that will be able to access the AVD
 variable "avd_users" {
   default = [
     "miguel@silicio14.co"
